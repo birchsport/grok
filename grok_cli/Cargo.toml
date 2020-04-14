@@ -11,3 +11,8 @@ chrono = "0.4.11"
 serde_json = "1.0.51"
 
 grok_lib = { path = "../grok_lib" }
+
+[[bin]]
+bench = false
+path = "src/main.rs"
+name = "grok"

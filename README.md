@@ -1,5 +1,11 @@
 Small utility application to reshape the JSON logs we write to Cloudwatch.  It expects input to be piped from STDIN.
 
+To install:
+
+```cargo install  --root ~ --path grok_cli```
+
+This will place the binary in ```$HOME/bin```
+
 Example usage:
 
 ```awslogs get prod-api-store-json --watch -GS | grok```
