@@ -1,5 +1,9 @@
 Small utility application to reshape the JSON logs we write to Cloudwatch.  It expects input to be piped from STDIN.
 
+Install rust if you don't have it already:
+
+```curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh```
+
 To install:
 
 ```cargo install  --root ~ --path grok_cli```
