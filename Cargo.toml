@@ -1,0 +1,2 @@
+[workspace]
+members = ["grok_lib", "grok_cli"]
