@@ -1,7 +1,7 @@
 extern crate clap;
 extern crate grok_lib;
 extern crate termion;
-use termion::{color, style};
+use termion::color;
 
 use chrono::{TimeZone, Utc};
 use clap::{App, Arg};
