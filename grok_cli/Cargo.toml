@@ -2,14 +2,14 @@
 name = "grok"
 version = "0.1.0"
 authors = ["James Birchfield <jbirchfield@shopstyle.com>"]
-edition = "2020"
+edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 chrono = "0.4.11"
 serde_json = "1.0.51"
-
+clap = "~2.33.0"
 grok_lib = { path = "../grok_lib" }
 
 [[bin]]
