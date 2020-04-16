@@ -10,6 +10,7 @@ edition = "2018"
 chrono = "0.4.11"
 serde_json = "1.0.51"
 clap = "~2.33.0"
+termion = "*"
 grok_lib = { path = "../grok_lib" }
 
 [[bin]]

@@ -1,5 +1,8 @@
 extern crate clap;
 extern crate grok_lib;
+extern crate termion;
+use termion::{color, style};
+
 use chrono::{TimeZone, Utc};
 use clap::{App, Arg};
 use grok_lib::log_json::module_json::*;
@@ -28,11 +31,15 @@ fn main() {
         if level == "ALL" || level == jm.level {
             let dt = Utc.timestamp((jm.timeMillis / 1000) as i64, 0);
             println!(
-                "{} [{}] {} {} - {}",
+                "{}{} [{}] {}{} {}{} - {}{}",
+                color::Fg(color::White),
                 dt.to_rfc3339(),
                 jm.thread,
+                color::Fg(color::Magenta),
                 jm.level,
+                color::Fg(color::White),
                 jm.loggerName,
+                color::Fg(color::Cyan),
                 jm.message
             );
             match jm.thrown {
