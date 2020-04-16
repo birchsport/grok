@@ -32,7 +32,7 @@ fn main() {
             if level == "ALL" || level == jm.level {
                 let dt = Utc.timestamp((jm.timeMillis / 1000) as i64, 0);
                 println!(
-                    "{}{} [{}] {}{} {}{} - {}{}",
+                    "{}{} [{}] {}{} {}{} - {}{}{}",
                     color::Fg(color::White),
                     dt.to_rfc3339(),
                     jm.thread,
@@ -41,7 +41,8 @@ fn main() {
                     color::Fg(color::White),
                     jm.loggerName,
                     color::Fg(color::Cyan),
-                    jm.message
+                    jm.message,
+                    color::Fg(color::White)
                 );
                 match jm.thrown {
                     Some(t) => {
