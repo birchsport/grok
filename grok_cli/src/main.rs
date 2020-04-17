@@ -68,6 +68,7 @@ fn main() {
             }
             Err(e) => {
                 // swallow
+                println!("Unable to parse line {}", e.to_string());
             }
         }
     }
