@@ -22,7 +22,15 @@ fn main() {
                 .takes_value(true)
                 .help("filter to a certain log level"),
         )
+        .arg(
+            Arg::with_name("nocolor")
+                .short("nc")
+                .long("nocolor")
+                .takes_value(false)
+                .help("disable color highlighting"),
+        )
         .get_matches();
+    let nocolor = matches.is_present("nocolor");
     let level = matches.value_of("level").unwrap_or("ALL");
     let stdin = io::stdin();
     for line in stdin.lock().lines() {
@@ -33,33 +41,55 @@ fn main() {
                 let jm: JSONMessage = l;
                 if level == "ALL" || level == jm.level {
                     let dt = Utc.timestamp((jm.timeMillis / 1000) as i64, 0);
-                    println!(
-                        "{}{} [{}] {}{} {}{} - {}{}{}",
-                        color::Fg(color::White),
-                        dt.to_rfc3339(),
-                        jm.thread,
-                        color::Fg(color::Magenta),
-                        jm.level,
-                        color::Fg(color::White),
-                        jm.loggerName,
-                        color::Fg(color::Cyan),
-                        jm.message,
-                        color::Fg(color::White)
-                    );
+                    if !nocolor {
+                        println!(
+                            "{}{} [{}] {}{} {}{} - {}{}{}",
+                            color::Fg(color::White),
+                            dt.to_rfc3339(),
+                            jm.thread,
+                            color::Fg(color::Magenta),
+                            jm.level,
+                            color::Fg(color::White),
+                            jm.loggerName,
+                            color::Fg(color::Cyan),
+                            jm.message,
+                            color::Fg(color::White)
+                        );
+                    } else {
+                        println!(
+                            "{} [{}] {} {} - {}",
+                            dt.to_rfc3339(),
+                            jm.thread,
+                            jm.level,
+                            jm.loggerName,
+                            jm.message,
+                        );
+                    }
                     match jm.thrown {
                         Some(t) => {
                             println!("{}", t.name);
                             for trace in t.extendedStackTrace {
-                                println!(
-                                    "\t at {}{}.{} ({}:{}) [{}]{}",
-                                    color::Fg(color::Red),
-                                    trace.class, 
-                                    trace.method, 
-                                    trace.file.unwrap_or("Unknown".to_string()),
-                                    trace.line, 
-                                    trace.location,
-                                    color::Fg(color::White)
-                                );
+                                if !nocolor {
+                                    println!(
+                                        "\t at {}{}.{} ({}:{}) [{}]{}",
+                                        color::Fg(color::Red),
+                                        trace.class,
+                                        trace.method,
+                                        trace.file.unwrap_or("Unknown".to_string()),
+                                        trace.line,
+                                        trace.location,
+                                        color::Fg(color::White)
+                                    );
+                                } else {
+                                    println!(
+                                        "\t at {}.{} ({}:{}) [{}]",
+                                        trace.class,
+                                        trace.method,
+                                        trace.file.unwrap_or("Unknown".to_string()),
+                                        trace.line,
+                                        trace.location,
+                                    );
+                                }
                             }
                         }
                         None => {
@@ -69,7 +99,6 @@ fn main() {
                 }
             }
             Err(e) => {
-                // swallow
                 println!("Unable to parse line {}", e.to_string());
             }
         }
