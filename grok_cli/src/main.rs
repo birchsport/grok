@@ -27,36 +27,47 @@ fn main() {
     let stdin = io::stdin();
     for line in stdin.lock().lines() {
         let line = line.expect("Could not read line from standard in");
-        if !line.is_empty() {
-            let jm: JSONMessage = serde_json::from_str(&line).unwrap();
-            if level == "ALL" || level == jm.level {
-                let dt = Utc.timestamp((jm.timeMillis / 1000) as i64, 0);
-                println!(
-                    "{}{} [{}] {}{} {}{} - {}{}{}",
-                    color::Fg(color::White),
-                    dt.to_rfc3339(),
-                    jm.thread,
-                    color::Fg(color::Magenta),
-                    jm.level,
-                    color::Fg(color::White),
-                    jm.loggerName,
-                    color::Fg(color::Cyan),
-                    jm.message,
-                    color::Fg(color::White)
-                );
-                match jm.thrown {
-                    Some(t) => {
-                        println!("{}", t.name);
-                        for trace in t.extendedStackTrace {
-                            let file = trace.file.unwrap_or("Unknown".to_string());
-                            println!(
-                                "\t at {}.{} ({}:{}) [{}]",
-                                trace.class, trace.method, file, trace.line, trace.location
-                            );
+        let j = serde_json::from_str(&line);
+        match j {
+            Ok(l) => {
+                let jm: JSONMessage = l;
+                if level == "ALL" || level == jm.level {
+                    let dt = Utc.timestamp((jm.timeMillis / 1000) as i64, 0);
+                    println!(
+                        "{}{} [{}] {}{} {}{} - {}{}{}",
+                        color::Fg(color::White),
+                        dt.to_rfc3339(),
+                        jm.thread,
+                        color::Fg(color::Magenta),
+                        jm.level,
+                        color::Fg(color::White),
+                        jm.loggerName,
+                        color::Fg(color::Cyan),
+                        jm.message,
+                        color::Fg(color::White)
+                    );
+                    match jm.thrown {
+                        Some(t) => {
+                            println!("{}", t.name);
+                            for trace in t.extendedStackTrace {
+                                println!(
+                                    "\t at {}.{} ({}:{}) [{}]",
+                                    trace.class, 
+                                    trace.method, 
+                                    trace.file.unwrap_or("Unknown".to_string()),
+                                    trace.line, 
+                                    trace.location
+                                );
+                            }
+                        }
+                        None => {
+                            //swallow
                         }
                     }
-                    None => {}
                 }
+            }
+            Err(e) => {
+                // swallow
             }
         }
     }
