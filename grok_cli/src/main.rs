@@ -51,12 +51,14 @@ fn main() {
                             println!("{}", t.name);
                             for trace in t.extendedStackTrace {
                                 println!(
-                                    "\t at {}.{} ({}:{}) [{}]",
+                                    "\t at {}{}.{} ({}:{}) [{}]{}",
+                                    color::Fg(color::Red),
                                     trace.class, 
                                     trace.method, 
                                     trace.file.unwrap_or("Unknown".to_string()),
                                     trace.line, 
-                                    trace.location
+                                    trace.location,
+                                    color::Fg(color::White)
                                 );
                             }
                         }
