@@ -35,7 +35,11 @@ fn main() {
     let stdin = io::stdin();
     for line in stdin.lock().lines() {
         let line = line.expect("Could not read line from standard in");
-        let j = serde_json::from_str(&line);
+        let mut words: Vec<&str> = line.split_whitespace().collect();
+        &words.remove(0);
+        let instance = &words.remove(0);
+        let json = &words.join(" ");
+        let j = serde_json::from_str(&json);
         match j {
             Ok(l) => {
                 let jm: JSONMessage = l;
@@ -43,17 +47,18 @@ fn main() {
                     let dt = Utc.timestamp((jm.timeMillis / 1000) as i64, 0);
                     if !nocolor {
                         println!(
-                            "{}{} [{}] {}{} {}{} - {}{}{}",
-                            color::Fg(color::White),
+                            "{}{} -- {} [{}] {}{} {}{} - {}{}{}",
+                            color::Fg(color::Reset),
+                            instance,
                             dt.to_rfc3339(),
                             jm.thread,
                             color::Fg(color::Magenta),
                             jm.level,
-                            color::Fg(color::White),
+                            color::Fg(color::Reset),
                             jm.loggerName,
                             color::Fg(color::Cyan),
                             jm.message,
-                            color::Fg(color::White)
+                            color::Fg(color::Reset)
                         );
                     } else {
                         println!(
@@ -78,7 +83,7 @@ fn main() {
                                         trace.file.unwrap_or("Unknown".to_string()),
                                         trace.line,
                                         trace.location,
-                                        color::Fg(color::White)
+                                        color::Fg(color::Reset)
                                     );
                                 } else {
                                     println!(
