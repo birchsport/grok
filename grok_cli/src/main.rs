@@ -47,37 +47,17 @@ fn main() {
                     let dt = Utc.timestamp((jm.timeMillis / 1000) as i64, 0);
                     println!(
                         "{}{} -- {} [{}] {}{} {}{} - {}{}{}",
-                        if !nocolor {
-                            color::Fg(color::Reset).to_string()
-                        } else {
-                            String::from("")
-                        },
+                        color_str(!nocolor, &color::Reset),
                         instance,
                         dt.to_rfc3339(),
                         jm.thread,
-                        if !nocolor {
-                            color::Fg(color::Magenta).to_string()
-                        } else {
-                            String::from("")
-                        },
+                        color_str(!nocolor, &color::Magenta),
                         jm.level,
-                        if !nocolor {
-                            color::Fg(color::Reset).to_string()
-                        } else {
-                            String::from("")
-                        },
+                        color_str(!nocolor, &color::Reset),
                         jm.loggerName,
-                        if !nocolor {
-                            color::Fg(color::Cyan).to_string()
-                        } else {
-                            String::from("")
-                        },
+                        color_str(!nocolor, &color::Cyan),
                         jm.message,
-                        if !nocolor {
-                            color::Fg(color::Reset).to_string()
-                        } else {
-                            String::from("")
-                        }
+                        color_str(!nocolor, &color::Reset)
                     );
                     match jm.thrown {
                         Some(t) => {
@@ -85,21 +65,13 @@ fn main() {
                             for trace in t.extendedStackTrace {
                                 println!(
                                     "\t at {}{}.{} ({}:{}) [{}]{}",
-                                    if !nocolor {
-                                        color::Fg(color::Red).to_string()
-                                    } else {
-                                        String::from("")
-                                    },
+                                    color_str(!nocolor, &color::Red),
                                     trace.class,
                                     trace.method,
                                     trace.file.unwrap_or("Unknown".to_string()),
                                     trace.line,
                                     trace.location,
-                                    if !nocolor {
-                                        color::Fg(color::Reset).to_string()
-                                    } else {
-                                        String::from("")
-                                    },
+                                    color_str(!nocolor, &color::Reset)
                                 );
                             }
                         }
@@ -113,5 +85,13 @@ fn main() {
                 println!("Unable to parse line {}", e.to_string());
             }
         }
+    }
+}
+
+fn color_str(b: bool, c: &dyn color::Color) -> String {
+    if b {
+        return color::Fg(c).to_string();
+    } else {
+        return String::from("");
     }
 }
