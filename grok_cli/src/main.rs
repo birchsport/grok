@@ -45,56 +45,62 @@ fn main() {
                 let jm: JSONMessage = l;
                 if level == "ALL" || level == jm.level {
                     let dt = Utc.timestamp((jm.timeMillis / 1000) as i64, 0);
-                    if !nocolor {
-                        println!(
-                            "{}{} -- {} [{}] {}{} {}{} - {}{}{}",
-                            color::Fg(color::Reset),
-                            instance,
-                            dt.to_rfc3339(),
-                            jm.thread,
-                            color::Fg(color::Magenta),
-                            jm.level,
-                            color::Fg(color::Reset),
-                            jm.loggerName,
-                            color::Fg(color::Cyan),
-                            jm.message,
-                            color::Fg(color::Reset)
-                        );
-                    } else {
-                        println!(
-                            "{} [{}] {} {} - {}",
-                            dt.to_rfc3339(),
-                            jm.thread,
-                            jm.level,
-                            jm.loggerName,
-                            jm.message,
-                        );
-                    }
+                    println!(
+                        "{}{} -- {} [{}] {}{} {}{} - {}{}{}",
+                        if !nocolor {
+                            color::Fg(color::Reset).to_string()
+                        } else {
+                            String::from("")
+                        },
+                        instance,
+                        dt.to_rfc3339(),
+                        jm.thread,
+                        if !nocolor {
+                            color::Fg(color::Magenta).to_string()
+                        } else {
+                            String::from("")
+                        },
+                        jm.level,
+                        if !nocolor {
+                            color::Fg(color::Reset).to_string()
+                        } else {
+                            String::from("")
+                        },
+                        jm.loggerName,
+                        if !nocolor {
+                            color::Fg(color::Cyan).to_string()
+                        } else {
+                            String::from("")
+                        },
+                        jm.message,
+                        if !nocolor {
+                            color::Fg(color::Reset).to_string()
+                        } else {
+                            String::from("")
+                        }
+                    );
                     match jm.thrown {
                         Some(t) => {
                             println!("{}", t.name);
                             for trace in t.extendedStackTrace {
-                                if !nocolor {
-                                    println!(
-                                        "\t at {}{}.{} ({}:{}) [{}]{}",
-                                        color::Fg(color::Red),
-                                        trace.class,
-                                        trace.method,
-                                        trace.file.unwrap_or("Unknown".to_string()),
-                                        trace.line,
-                                        trace.location,
-                                        color::Fg(color::Reset)
-                                    );
-                                } else {
-                                    println!(
-                                        "\t at {}.{} ({}:{}) [{}]",
-                                        trace.class,
-                                        trace.method,
-                                        trace.file.unwrap_or("Unknown".to_string()),
-                                        trace.line,
-                                        trace.location,
-                                    );
-                                }
+                                println!(
+                                    "\t at {}{}.{} ({}:{}) [{}]{}",
+                                    if !nocolor {
+                                        color::Fg(color::Red).to_string()
+                                    } else {
+                                        String::from("")
+                                    },
+                                    trace.class,
+                                    trace.method,
+                                    trace.file.unwrap_or("Unknown".to_string()),
+                                    trace.line,
+                                    trace.location,
+                                    if !nocolor {
+                                        color::Fg(color::Reset).to_string()
+                                    } else {
+                                        String::from("")
+                                    },
+                                );
                             }
                         }
                         None => {
