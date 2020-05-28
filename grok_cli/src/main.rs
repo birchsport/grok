@@ -55,7 +55,13 @@ fn main() {
                         jm.level,
                         color_str(!nocolor, &color::Reset),
                         jm.loggerName,
-                        color_str(!nocolor, &color::Cyan),
+                        if jm.level == "ERROR" {
+                            color_str(!nocolor, &color::Red)
+                        } else if jm.level == "WARN" {
+                            color_str(!nocolor, &color::Yellow)
+                        } else {
+                            color_str(!nocolor, &color::Cyan)
+                        },
                         jm.message,
                         color_str(!nocolor, &color::Reset)
                     );
