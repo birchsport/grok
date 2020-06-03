@@ -88,7 +88,7 @@ fn main() {
                 }
             }
             Err(e) => {
-                println!("Unable to parse line {}", e.to_string());
+                println!("Unable to parse line {} :: input - {}", e.to_string(), json);
             }
         }
     }
