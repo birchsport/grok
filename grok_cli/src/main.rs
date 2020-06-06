@@ -48,7 +48,7 @@ fn main() {
             read_from_process(level.to_string(), nocolor, stream.to_string());
         }
         loop {
-            thread::sleep(Duration::from_millis(1));
+            thread::sleep(Duration::from_millis(100));
         }
     } else {
         read_from_stdin(level.to_string(), nocolor);
