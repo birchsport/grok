@@ -6,7 +6,10 @@ use termion::color;
 use chrono::{TimeZone, Utc};
 use clap::{App, Arg};
 use grok_lib::log_json::module_json::*;
-use std::io::{self, BufRead};
+use std::io::{self, BufRead, BufReader};
+use std::process::{Command, Stdio};
+use std::thread;
+use std::time::Duration;
 
 fn main() {
     let matches = App::new("grok")
@@ -23,6 +26,13 @@ fn main() {
                 .help("filter to a certain log level"),
         )
         .arg(
+            Arg::with_name("streams")
+                .short("s")
+                .long("streams")
+                .takes_value(true)
+                .help("CSV of all streams to read"),
+        )
+        .arg(
             Arg::with_name("nocolor")
                 .short("nc")
                 .long("nocolor")
@@ -32,70 +42,116 @@ fn main() {
         .get_matches();
     let nocolor = matches.is_present("nocolor");
     let level = matches.value_of("level").unwrap_or("ALL");
+    if matches.is_present("streams") {
+        let streams: Vec<&str> = matches.value_of("streams").unwrap().split(",").collect();
+        for stream in streams {
+            read_from_process(level.to_string(), nocolor, stream.to_string());
+        }
+        loop {
+            thread::sleep(Duration::from_millis(1));
+        }
+    } else {
+        read_from_stdin(level.to_string(), nocolor);
+    }
+}
+
+fn read_from_stdin(level: String, nocolor: bool) {
     let stdin = io::stdin();
     for line in stdin.lock().lines() {
         match line {
             Ok(l) => {
-                let mut words: Vec<&str> = l.split_whitespace().collect();
-                &words.remove(0);
-                let instance = &words.remove(0);
-                let json = &words.join(" ");
-                let j = serde_json::from_str(&json);
-                match j {
+                log_string(level.to_string(), nocolor, l);
+            }
+            Err(e) => {
+                //swallow
+            }
+        }
+    }
+}
+
+fn read_from_process(level: String, nocolor: bool, stream: String) {
+    thread::spawn(move || {
+        let mut cmd = Command::new("awslogs")
+            .args(&["get", &stream, "--watch"])
+            .stdout(Stdio::piped())
+            .spawn()
+            .unwrap();
+        {
+            let stdout = cmd.stdout.as_mut().unwrap();
+            let stdout_reader = BufReader::new(stdout);
+            let stdout_lines = stdout_reader.lines();
+
+            for line in stdout_lines {
+                match line {
                     Ok(l) => {
-                        let jm: JSONMessage = l;
-                        if level == "ALL" || level == jm.level {
-                            let dt = Utc.timestamp((jm.timeMillis / 1000) as i64, 0);
-                            println!(
-                                "{}{} -- {} [{}] {}{} {}{} - {}{}{}",
-                                color_str(!nocolor, &color::Reset),
-                                instance,
-                                dt.to_rfc3339(),
-                                jm.thread,
-                                color_str(!nocolor, &color::Magenta),
-                                jm.level,
-                                color_str(!nocolor, &color::Reset),
-                                jm.loggerName,
-                                if jm.level == "ERROR" {
-                                    color_str(!nocolor, &color::Red)
-                                } else if jm.level == "WARN" {
-                                    color_str(!nocolor, &color::Yellow)
-                                } else {
-                                    color_str(!nocolor, &color::Cyan)
-                                },
-                                jm.message,
-                                color_str(!nocolor, &color::Reset)
-                            );
-                            match jm.thrown {
-                                Some(t) => {
-                                    println!("{}", t.name);
-                                    for trace in t.extendedStackTrace {
-                                        println!(
-                                            "\t at {}{}.{} ({}:{}) [{}]{}",
-                                            color_str(!nocolor, &color::Red),
-                                            trace.class,
-                                            trace.method,
-                                            trace.file.unwrap_or("Unknown".to_string()),
-                                            trace.line,
-                                            trace.location,
-                                            color_str(!nocolor, &color::Reset)
-                                        );
-                                    }
-                                }
-                                None => {
-                                    //swallow
-                                }
-                            }
-                        }
+                        log_string(level.to_string(), nocolor, l);
                     }
                     Err(e) => {
-                        println!("Unable to parse json {} :: input - {}", e.to_string(), l);
+                        println!("Unable to parse input {}", e.to_string());
                     }
                 }
             }
-            Err(e) => {
-                println!("Unable to parse line {}", e.to_string());
+        }
+        cmd.wait().unwrap();
+    });
+}
+
+fn log_string(level: String, nocolor: bool, line: String) {
+    let mut words: Vec<&str> = line.split_whitespace().collect();
+    let stream = &words.remove(0);
+    let instance = &words.remove(0);
+    let json = &words.join(" ");
+    let j = serde_json::from_str(&json);
+    match j {
+        Ok(l) => {
+            let jm: JSONMessage = l;
+            if level == "ALL" || level == jm.level {
+                let dt = Utc.timestamp((jm.timeMillis / 1000) as i64, 0);
+                println!(
+                    "{}{} {} -- {} [{}] {}{} {}{} - {}{}{}",
+                    color_str(!nocolor, &color::Reset),
+                    stream,
+                    instance,
+                    dt.to_rfc3339(),
+                    jm.thread,
+                    color_str(!nocolor, &color::Magenta),
+                    jm.level,
+                    color_str(!nocolor, &color::Reset),
+                    jm.loggerName,
+                    if jm.level == "ERROR" {
+                        color_str(!nocolor, &color::Red)
+                    } else if jm.level == "WARN" {
+                        color_str(!nocolor, &color::Yellow)
+                    } else {
+                        color_str(!nocolor, &color::Cyan)
+                    },
+                    jm.message,
+                    color_str(!nocolor, &color::Reset)
+                );
+                match jm.thrown {
+                    Some(t) => {
+                        println!("{}", t.name);
+                        for trace in t.extendedStackTrace {
+                            println!(
+                                "\t at {}{}.{} ({}:{}) [{}]{}",
+                                color_str(!nocolor, &color::Red),
+                                trace.class,
+                                trace.method,
+                                trace.file.unwrap_or("Unknown".to_string()),
+                                trace.line,
+                                trace.location,
+                                color_str(!nocolor, &color::Reset)
+                            );
+                        }
+                    }
+                    None => {
+                        //swallow
+                    }
+                }
             }
+        }
+        Err(e) => {
+            println!("Unable to parse json {} :: input - {}", e.to_string(), line);
         }
     }
 }
