@@ -63,7 +63,7 @@ fn read_from_stdin(level: String, nocolor: bool) {
                 log_string(level.to_string(), nocolor, l);
             }
             Err(e) => {
-                //swallow
+                println!("Unable to parse input {}", e.to_string());
             }
         }
     }
