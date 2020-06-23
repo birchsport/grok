@@ -39,28 +39,36 @@ fn main() {
                 .takes_value(false)
                 .help("disable color highlighting"),
         )
+        .arg(
+            Arg::with_name("raw")
+                .short("r")
+                .long("raw")
+                .takes_value(false)
+                .help("consume raw json (not from awslogs)"),
+        )
         .get_matches();
     let nocolor = matches.is_present("nocolor");
+    let raw = matches.is_present("raw");
     let level = matches.value_of("level").unwrap_or("ALL");
     if matches.is_present("streams") {
         let streams: Vec<&str> = matches.value_of("streams").unwrap().split(",").collect();
         for stream in streams {
-            read_from_process(level.to_string(), nocolor, stream.to_string());
+            read_from_process(level.to_string(), nocolor, raw, stream.to_string());
         }
         loop {
             thread::sleep(Duration::from_millis(100));
         }
     } else {
-        read_from_stdin(level.to_string(), nocolor);
+        read_from_stdin(level.to_string(), nocolor, raw);
     }
 }
 
-fn read_from_stdin(level: String, nocolor: bool) {
+fn read_from_stdin(level: String, nocolor: bool, raw: bool) {
     let stdin = io::stdin();
     for line in stdin.lock().lines() {
         match line {
             Ok(l) => {
-                log_string(level.to_string(), nocolor, l);
+                log_string(level.to_string(), nocolor, raw, l);
             }
             Err(e) => {
                 println!("Unable to parse input {}", e.to_string());
@@ -69,7 +77,7 @@ fn read_from_stdin(level: String, nocolor: bool) {
     }
 }
 
-fn read_from_process(level: String, nocolor: bool, stream: String) {
+fn read_from_process(level: String, nocolor: bool, raw: bool, stream: String) {
     thread::spawn(move || {
         let mut cmd = Command::new("awslogs")
             .args(&["get", &stream, "--watch"])
@@ -84,7 +92,7 @@ fn read_from_process(level: String, nocolor: bool, stream: String) {
             for line in stdout_lines {
                 match line {
                     Ok(l) => {
-                        log_string(level.to_string(), nocolor, l);
+                        log_string(level.to_string(), nocolor, raw, l);
                     }
                     Err(e) => {
                         println!("Unable to parse input {}", e.to_string());
@@ -96,10 +104,14 @@ fn read_from_process(level: String, nocolor: bool, stream: String) {
     });
 }
 
-fn log_string(level: String, nocolor: bool, line: String) {
+fn log_string(level: String, nocolor: bool, raw: bool, line: String) {
     let mut words: Vec<&str> = line.split_whitespace().collect();
-    let stream = &words.remove(0);
-    let instance = &words.remove(0);
+    let mut stream = "";
+    let mut instance = "";
+    if ! raw {
+        stream = &words.remove(0);
+        instance = &words.remove(0);
+    }
     let json = &words.join(" ");
     let j = serde_json::from_str(&json);
     match j {
