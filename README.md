@@ -12,7 +12,9 @@ This will place the binary in ```$HOME/bin```
 
 Example usage:
 
-```awslogs get prod-api-store-json --watch -GS | grok```
+```awslogs get prod-api-store-json --watch | grok```
+or
+```grok -s prod-api-store-json```
 
 Input looks like this:
 
