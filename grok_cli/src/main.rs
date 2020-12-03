@@ -118,7 +118,11 @@ fn log_string(level: String, nocolor: bool, raw: bool, line: String) {
         Ok(l) => {
             let jm: JSONMessage = l;
             if level == "ALL" || level == jm.level {
-                let dt = Utc.timestamp((jm.timeMillis / 1000) as i64, 0);
+                let dtv = match jm.timeMillis {
+                    Some(val) => val,
+                    None => 0
+                };
+                let dt = Utc.timestamp((dtv / 1000) as i64, 0);
                 println!(
                     "{}{} {} -- {} [{}] {}{} {}{} - {}{}{}",
                     color_str(!nocolor, &color::Reset),

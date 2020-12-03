@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct JSONMessage {
-    pub timeMillis: u64,
+    pub timeMillis: Option<u64>,
     pub thread: String,
     pub level: String,
     pub loggerName: String,
