@@ -6,7 +6,7 @@ Install rust if you don't have it already:
 
 To install:
 
-```cargo install  --root ~ --path grok_cli```
+```cargo install --path . --root ~```
 
 This will place the binary in ```$HOME/bin```
 

@@ -226,7 +226,6 @@ mod tests {
         let input =  "prod-batch-ce-json prod-batch-1c004 {\"thread\":\"CommunicationEngineWorker-5\",\"level\":\"WARN\",\"loggerName\":\"com.shopstyle.messaging.ce.core.CommunicationRequestProcessor\",\"message\":\"Task type [CBReengageFavorite] took longer than [120] seconds to execute. Elapsed time: [3.471 min] - Request: [com.shopstyle.messaging.model.ce.CommunicationRequest@462d2036[id=7c60a640-b61c-4e55-812a-237568e93fd6,created=Mon Dec 21 11:31:22 CST 2020,source=5fe0dbc37be10c2ddad8cd46,appName=shopstyle,locale=en_US,types=[CBReengageFavorite],recipients=[40726490],frequencies={CBReengageFavorite=Monday},startDates=<null>,targets={CBReengageFavorite=[Email]},attributes=<null>,limit=1]]\",\"endOfBatch\":false,\"loggerFqcn\":\"org.apache.logging.slf4j.Log4jLogger\",\"instant\":{\"epochSecond\":1608579508,\"nanoOfSecond\":964000000},\"contextMap\":{},\"threadId\":95,\"threadPriority\":5}";
 
         let result = super::create_log_string("ALL".to_string(), false, false, input.to_string());
-        println!("{} foo", result);
         assert_eq!(result.is_empty(), false);
     }
 }
