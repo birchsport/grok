@@ -160,7 +160,6 @@ async fn main() {
 }
 
 async fn read_from_cloudwatch(config: Config) {
-    let client = CloudWatchLogsClient::new(Region::from_str(&*config.region).unwrap());
     let mut end;
     let mut start;
     let mut watch = true;
@@ -208,6 +207,7 @@ async fn read_from_cloudwatch(config: Config) {
         debug!("Group: {}", get_log_req.log_group_name);
         debug!("Range: {}", end - start);
 
+        let client = CloudWatchLogsClient::new(Region::from_str(&*config.region).unwrap());
         let mut next_token = None;
         'inner: loop {
             get_log_req.next_token = next_token;
