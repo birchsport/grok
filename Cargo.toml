@@ -13,9 +13,9 @@ serde_json = "1.0.51"
 clap = "~2.33.0"
 termion = "*"
 futures = { version = "0.3.*" }
-tokio = {version = "0.2.*", features = ["full"] }
-rusoto_core = "0.43.0"
-rusoto_logs = "0.43.0"
+tokio = {version = "1.20.*", features = ["full"] }
+rusoto_core = "0.48.0"
+rusoto_logs = "0.48.0"
 log = "0.4.14"
 env_logger = "0.8.3"
 regex = "1"
