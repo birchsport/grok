@@ -1,8 +1,8 @@
 [package]
 name = "grok"
 version = "0.4.3"
-authors = ["James Birchfield <jbirchfield@shopstyle.com>"]
-edition = "2018"
+authors = ["James Birchfield <jbirchfield@demeterlogistics.com>"]
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
