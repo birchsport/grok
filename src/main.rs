@@ -38,7 +38,7 @@ async fn main() {
     let matches = App::new("grok")
         .version(crate_version!())
         .author("James Birchfield <jbirchfield@demeterlogistics.com>")
-        .about("Reshapes JSON logging")
+        .about("Streams Cloudwatch Logs")
         .arg(
             Arg::with_name("region")
                 .short("r")
