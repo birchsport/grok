@@ -1,0 +1,27 @@
+[package]
+name = "grok"
+version = "0.4.3"
+authors = ["James Birchfield <jbirchfield@shopstyle.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = "0.4.11"
+serde = { version = "1.0.106", features = ["derive"] }
+serde_json = "1.0.51"
+clap = "~2.33.0"
+termion = "*"
+futures = { version = "0.3.*" }
+tokio = {version = "0.2.*", features = ["full"] }
+rusoto_core = "0.43.0"
+rusoto_logs = "0.43.0"
+log = "0.4.14"
+env_logger = "0.8.3"
+regex = "1"
+chrono-english = "0.1.6"
+
+[[bin]]
+bench = false
+path = "src/main.rs"
+name = "grok"
