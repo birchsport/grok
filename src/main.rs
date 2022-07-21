@@ -122,18 +122,21 @@ async fn main() {
         if matches.is_present("groups") {
             let mut handles = vec![];
             let mut groups: Vec<String> = vec![];
-            let groupStr = matches.value_of("groups").unwrap();
-            if groupStr.starts_with("all") {
-                let group_opts:Vec<&str> = groupStr.split(":").collect();
-                let filter = group_opts.get(1).unwrap().to_string();
+            let group_str = matches.value_of("groups").unwrap();
+            if group_str.starts_with("all") {
+                let group_opts: Vec<&str> = group_str.split(":").collect();
+                let filter_csv = group_opts.get(1).unwrap().to_string();
+                let filter_opts: Vec<&str> = filter_csv.split(",").collect();
                 let mut all_groups: Vec<String> = get_groups(region).await
-                .into_iter()
-                    .filter(|voc| voc.contains(&filter))
+                    .into_iter()
+                    .filter(|group|
+                        filter_opts.iter().any(|&f|
+                            group.to_string().contains(&f.to_string())))
                     .collect();
                 groups.append(&mut all_groups);
             } else {
                 let provided_groups: Vec<&str> = matches.value_of("groups").unwrap().split(",").collect();
-                let mut pgs: Vec<String> = provided_groups.iter().map(|&s|s.into()).collect();
+                let mut pgs: Vec<String> = provided_groups.iter().map(|&s| s.into()).collect();
                 groups.append(&mut pgs);
             }
             for group in groups.into_iter() {
