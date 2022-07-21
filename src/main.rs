@@ -139,7 +139,15 @@ async fn main() {
                 let mut pgs: Vec<String> = provided_groups.iter().map(|&s| s.into()).collect();
                 groups.append(&mut pgs);
             }
-            for group in groups.into_iter() {
+            if groups.len() > 10 {
+                println!("Only showing first 10 groups");
+            }
+            for x in (0..10) {
+                let group_o = groups.get(x);
+                if group_o.is_none() {
+                    break;
+                }
+                let group = group_o.unwrap();
                 let config = Config {
                     region: region.to_string(),
                     nocolor: nocolor,
