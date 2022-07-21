@@ -140,9 +140,9 @@ async fn main() {
                 groups.append(&mut pgs);
             }
             if groups.len() > 10 {
-                println!("Only showing first 10 groups");
+                println!("Only showing first 8 groups");
             }
-            for x in (0..10) {
+            for x in (0..8) {
                 let group_o = groups.get(x);
                 if group_o.is_none() {
                     break;

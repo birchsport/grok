@@ -6,6 +6,11 @@ To install:
 
 ```cargo install --path . --root ~```
 
+or
+
+```make install```
+
+
 This will place the binary in ```$HOME/bin```
 
 Usage:
